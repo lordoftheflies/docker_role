@@ -4,7 +4,7 @@
 
 # START - boilerplate tasks
 
-- name: Load OS specific variables
+- name: "Load OS specific variables"
   include_vars: "{{ item }}"
   with_first_found:
     - files:
@@ -54,10 +54,10 @@
 ## CentOS
 
 - name: "Run CentOS  specific tasks"
-  include_tasks: "centos_.yml"
+  include_tasks: "centos_{{item}}.yml"
   static: false
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version| int == ""
-  with_distributions:
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version| int == item
+  with_items:
     - 7
     - 8
     - 9
@@ -65,21 +65,19 @@
 ## Debian
 
 - name: "Run Debian  (Stretch) specific tasks"
-  include_tasks: "debian_.yml"
-  static: false
-  when: ansible_distribution == 'Debian' and ansible_distribution_major_version| int == ""
-  with_distributions:
+  include_tasks: "debian_{{ item }}.yml"
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version| int == item
+  with_items:
     - 7
     - 8
     - 9
 
 ## Ubuntu
 
-- name: "Run Ubuntu  specific tasks"
-  include_tasks: "ubuntu_.yml"
-  static: false
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == ""
-  with_distributions:
+- name: "Run Ubuntu specific tasks"
+  include_tasks: "ubuntu_{{item}}.yml"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == item
+  with_items:
       - 12.04
       - 14.04
       - 16.04
@@ -89,7 +87,13 @@
 
 - name: "Install necessary packages"
   package:
-    - name: python-pip
+    - name: python3-pip
       state: present
     - name: libssl-dev
       state: present
+
+- name: "Setup grub"
+  include_tasks: "grub.yml"
+
+- name: "Setup Docker runtime"
+  include_tasks: "docker.yml"
