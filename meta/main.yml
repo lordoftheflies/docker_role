@@ -2,7 +2,8 @@
 
 galaxy_info:
   author: 'László Hegedűs'
-  role_name: ansible_role_
+  role_name: ansible_role_docker
+  version: '0.1.0'
   description: 'Ansible Galaxy role for Docker.'
   company: 'Cherubits'
   license: Apache-2.0
