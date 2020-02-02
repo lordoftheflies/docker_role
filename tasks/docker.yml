@@ -6,6 +6,7 @@
     state: absent
   with_items: "{{ ansible_role_docker.excluded_linux_packages }}"
 
+
 - name: "Install included linux packages"
   become: yes
   package:
