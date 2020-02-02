@@ -6,14 +6,12 @@
     state: absent
   with_items: "{{ ansible_role_docker.excluded_linux_packages }}"
 
-
 - name: "Install included linux packages"
   become: yes
   package:
     name: "{{ items }}"
     state: present
   with_items: "{{ ansible_role_docker.included_linux_packages }}"
-
 
 - name: "Add an Apt signing key, will not download if present"
   become: yes
@@ -90,13 +88,4 @@
     state: present
   when: ansible_role_docker.listening_hosts is defined
   with_items: "{{ ansible_role_docker.listening_hosts }}"
-  tags:
-    - cherubits
-    - common
-    - fqdn
-- name: "Enhance grub"
-  become: yes
-  lineinfile:
-    path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX='
-    line: GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
+  tags: [ "cherubits", "docker", "daemon" ]
