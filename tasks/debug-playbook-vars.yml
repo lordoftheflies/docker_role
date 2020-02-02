@@ -1,0 +1,12 @@
+---
+# Debug other values or specific values you want printed last
+
+
+- name: "Debug - ansible playbook variable values"
+  debug: msg="{{ vars }}"
+  when: ansible_role_docker_debug
+
+
+- name: "Debug value of playbook vars"
+  debug: msg="{{ vars | to_yaml }}"
+  when: ansible_role_docker_debug

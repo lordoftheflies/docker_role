@@ -1,0 +1,7 @@
+---
+
+# Debug group_vars and host_vars values
+
+- name: "Debug - group and host vars from {{ hostvars[inventory_hostname] }}"
+  debug: msg="{{ hostvars[inventory_hostname] }}"
+  when: ansible_role_docker_debug

@@ -1,0 +1,7 @@
+---
+
+
+- debug:
+    msg:
+      - "CentOS 5 not supported at this time"
+      - "System {{ inventory_hostname }} not configured"

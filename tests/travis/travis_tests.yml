@@ -1,0 +1,7 @@
+---
+# Ansible Role: ansible_role_docker
+
+- hosts: localhost
+  become: true
+  roles:
+    - ansible-role-ansible_role_docker

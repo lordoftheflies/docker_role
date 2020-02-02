@@ -1,0 +1,5 @@
+---
+# ansible-role-ansible_role_docker/vars/debian.yml
+
+# Debian specific vars
+ansible_role_docker_package_extension: 'deb'

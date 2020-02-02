@@ -1,0 +1,6 @@
+---
+
+- debug:
+    msg:
+      - "Ubuntu 12.04 not supported at this time"
+      - "System {{ inventory_hostname }} not configured"

@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    - ansible_role_docker_deployment_users_home: /home/vagrant
+    - ansible_role_docker_testing_provider: vagrant
+  roles:
+    - ansible_role_docker
