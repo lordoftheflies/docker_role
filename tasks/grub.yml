@@ -1,10 +1,12 @@
 ---
 - name: "Check if cgroup memory and swapaccount in kernel"
+  become: yes
   shell: grep GRUB_CMDLINE_LINUX_DEFAULT /etc/default/grub | grep -c "cgroup_enable=memory swapaccount=1"
   register: cgroup_status
   ignore_errors: true
 
 - name: "Enable cgroup memory and swapaccount"
+  become: yes
   lineinfile:
     backup: yes
     dest: "/etc/default/grub"
@@ -14,10 +16,12 @@
   when: cgroup_status.stdout == "0"
 
 - name: "Update Grub"
+  become: yes
   shell: update-grub
   when: cgroup_status.stdout == "0"
 
 - name: "Reboot if we need it"
+  become: yes
   shell: sleep 2 && shutdown -r now "Ansible updates triggered"
   async: 1
   poll: 0
@@ -25,6 +29,7 @@
   when: cgroup_status.stdout == "0"
 
 - name: "waiting for server to come back"
+  become: yes
   local_action: "wait_for host={{ansible_fqdn}} state=started timeout=600 delay=15"
   sudo: false
   when: cgroup_status.stdout == "0"

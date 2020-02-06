@@ -23,3 +23,6 @@ ansible_role_docker:
     - docker-ce
     - docker-ce-cli
     - containerd.io
+  external_linux_packages:
+    - python3-pip
+    - libssl-dev

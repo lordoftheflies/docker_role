@@ -4,7 +4,7 @@
 
 # START - boilerplate tasks
 
-- name: "Load OS specific variables"
+- name: "Load '{{ ansible_os_family }}' specific variables"
   include_vars: "{{ item }}"
   with_first_found:
     - files:
@@ -55,7 +55,6 @@
 
 - name: "Run CentOS  specific tasks"
   include_tasks: "centos_{{item}}.yml"
-  static: false
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version| int == item
   with_items:
     - 7
@@ -86,11 +85,11 @@
       - 19.04
 
 - name: "Install necessary packages"
+  become: yes
   package:
-    - name: python3-pip
-      state: present
-    - name: libssl-dev
-      state: present
+    name: "{{item}}"
+    state: present
+  with_items: "{{ansible_role_docker.external_linux_packages}}"
 
 - name: "Setup grub"
   include_tasks: "grub.yml"
