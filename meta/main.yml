@@ -15,4 +15,4 @@ galaxy_info:
     - cherubits
     - docker
 dependencies: []
-#  - lordoftheflies.ansible_role_python
+  - lordoftheflies.ansible_role_python
