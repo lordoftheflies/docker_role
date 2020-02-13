@@ -25,20 +25,6 @@
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
 
-- name: "Install custom linux packages"
-  become: yes
-  package:
-    name: "{{ items }}"
-    state: present
-  with_items: "{{ ansible_role_docker.custom_linux_packages }}"
-
-- name: Create a data container
-  docker_container:
-    name: review-container
-    image: hello-world
-    volumes:
-      - /data
-
 - name: "Ensure group for Docker exists"
   become: yes
   group:
@@ -53,12 +39,25 @@
     group: docker
     state: present
 
+- name: "Install custom linux packages"
+  become: yes
+  package:
+    name: "{{ items }}"
+    state: present
+  with_items: "{{ ansible_role_docker.custom_linux_packages }}"
+
+- name: Create a data container
+  docker_container:
+    name: review-container
+    image: hello-world
+    volumes:
+      - /data
+
 - name: "Remove working directory"
   become: yes
   file:
     path: "{{ ansible_role_docker.variables_directory }}"
     state: absent
-
 - name: "Add working directory"
   become: yes
   file:
@@ -69,14 +68,12 @@
   become: yes
   systemd:
     name: docker.socket
-    state: restarted
     enabled: yes
 
 - name: "Enable docker service"
   become: yes
   systemd:
     name: docker.service
-    state: restarted
     enabled: yes
 
 - name: "Configuring remote access with daemon.json"
@@ -89,3 +86,16 @@
   when: ansible_role_docker.listening_hosts is defined
   with_items: "{{ ansible_role_docker.listening_hosts }}"
   tags: [ "cherubits", "docker", "daemon" ]
+
+
+- name: "Restart 'docker-socket' service"
+  become: yes
+  systemd:
+    name: docker.socket
+    state: restarted
+
+- name: "Restart 'docker' service"
+  become: yes
+  systemd:
+    name: docker.service
+    state: restarted

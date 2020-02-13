@@ -78,3 +78,9 @@ pass, fail, untested
 License: [Apache-2.0](Apache-2.0)
 
 > **NOTE**: This skeleton generated using [galaxy-role-skeleton](https://github.com/cjsteel/galaxy-role-skeleton)
+
+## Referencies
+
+* [Docker Manual](https://docs.docker.com/get-started/)
+* [Installation Guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [Postinstall steps](https://docs.docker.com/install/linux/linux-postinstall/)

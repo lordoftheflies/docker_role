@@ -1,9 +1,10 @@
 ---
 
 galaxy_info:
-  author: 'László Hegedűs'
-  role_name: ansible_role_
+  role_name: ansible_role_docker
+  version: '0.1.0'
   description: 'Ansible Galaxy role for Docker.'
+  author: 'László Hegedűs'
   company: 'Cherubits'
   license: Apache-2.0
   min_ansible_version: '2.9'
@@ -14,4 +15,5 @@ galaxy_info:
   galaxy_tags:
     - cherubits
     - docker
-dependencies: []
+dependencies:
+  - lordoftheflies.ansible_role_python
