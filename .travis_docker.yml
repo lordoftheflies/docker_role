@@ -31,7 +31,7 @@ script:
     lineinfile -a "regexp=^#host_key_checking dest=/etc/ansible/ansible.cfg line='host_key_checking = False'" -c local
 
   # Check the role/playbook's syntax.
-  - ansible-playbook -i tests/inventory tests/travis.yml --syntax-check
+  - ansible-playbook -i tests/travis/inventory.ini tests/travis/travis.yml --syntax-check
 
   # Run the role/playbook with ansible-playbook.
   - >

@@ -84,7 +84,6 @@
     dest: /etc/docker/daemon.json
     state: present
   when: ansible_role_docker.listening_hosts is defined
-  with_items: "{{ ansible_role_docker.listening_hosts }}"
   tags: [ "cherubits", "docker", "daemon" ]
 
 
@@ -93,6 +92,23 @@
   systemd:
     name: docker.socket
     state: restarted
+
+
+- name: "Add docker daemon unit"
+  become: yes
+  become: root
+  template:
+    backup: yes
+    src: dockerd.unit.j2
+    dest: /lib/systemd/system/docker.service
+    state: present
+    mode: u+rwx,g+rx,o+rx
+  tags: [ "cherubits", "docker", "systemd" ]
+
+- name: "Reload service daemons"
+  become: yes
+  systemd:
+    daemon_reload: yes
 
 - name: "Restart 'docker' service"
   become: yes

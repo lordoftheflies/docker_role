@@ -1,4 +1,4 @@
 {
-    "hosts": {{ ansible_role_docker.hosts }},
-    "dns": {{ ansible_role_docker.dns }}
+    "hosts": [{% for str in ansible_role_docker.listening_hosts %}"{{ str }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    "dns": [{% for str in ansible_role_docker.dns %}"{{ str }}"{% if not loop.last %},{% endif %}{% endfor %}]
 }
