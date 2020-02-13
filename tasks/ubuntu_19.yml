@@ -1,0 +1,79 @@
+---
+- name: "Remove excluded linux packages"
+  become: yes
+  package:
+    name: "{{ excluded_linux_package }}"
+    state: absent
+  with_items: "{{ excluded_linux_packages }}"
+  loop_control:
+    loop_var: excluded_linux_package
+
+- name: "Install included linux packages"
+  become: yes
+  package:
+    name: "{{ included_linux_package }}"
+    state: present
+  with_items: "{{ included_linux_packages }}"
+  loop_control:
+    loop_var: included_linux_package
+
+- name: "Add an Apt signing key, will not download if present"
+  become: yes
+  apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+
+- name: "Add Docker Linux repository for {{ ansible_distribution }} {{ ansible_distribution_release }}."
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu disco stable"
+    state: present
+
+- name: "Update packages ({{ansible_os_family}})"
+  become: yes
+  when: ansible_os_family == 'Debian'
+  apt:
+    update_cache: yes
+
+- name: "Update packages ({{ansible_os_family}})"
+  become: yes
+  when: ansible_os_family == 'Redhat'
+  yum:
+    update_cache: yes
+
+- name: "Install custom linux packages"
+  become: yes
+  package:
+    name: "{{ custom_linux_package }}"
+    state: present
+  with_items: "{{ custom_linux_packages }}"
+  loop_control:
+    loop_var: custom_linux_package
+
+- name: "Create a data container"
+  docker_container:
+    name: review-container
+    image: hello-world
+    volumes:
+      - /data
+
+#
+#
+#- name: "Install necessary packages"
+#  become: yes
+#  package:
+#    name: "{{ custom_linux_package }}"
+#    state: present
+#  loop:
+#    - docker
+#    - docker-engine
+#    - docker.io
+#    - containerd
+#    - runc
+#  loop_control:
+#    loop_var: custom_linux_package
+#- name: "Setup grub"
+#  include_tasks: "grub.yml"
+#
+#- name: "Setup Docker runtime"
+#  include_tasks: "docker.yml"

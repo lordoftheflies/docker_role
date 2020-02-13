@@ -2,5 +2,5 @@
 
 - debug:
     msg:
-      - "Ubuntu 18.04 not supported at this time"
+      - "{{ ansible_distribution }} {{ ansible_distribution_version }} not supported at this time"
       - "System {{ inventory_hostname }} not configured"

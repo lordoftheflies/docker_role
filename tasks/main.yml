@@ -4,41 +4,31 @@
 
 # START - boilerplate tasks
 
-- name: "Load '{{ ansible_os_family }}' specific variables"
+- name: "Load {{ ansible_distribution }}-{{ ansible_distribution_version }} specific variables"
   include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ fact_role_path }}/vars/{{ ansible_os_family | lower }}.yml"
+        - "vars/{{ ansible_distribution | lower }}_{{ ansible_distribution_version }}.yml"
+        - "vars/{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}.yml"
+        - "vars/{{ ansible_distribution | lower }}.yml"
+        - "vars/{{ ansible_os_family | lower }}.yml"
       skip: true
 
-- name: "Run any OS specific tasks"
-  include: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ fact_role_path }}/tasks/{{ ansible_os_family | lower }}.yml"
-      skip: true
-
-- name: "Load distribution (centos, ubuntu) default variables"
-  include_vars: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ fact_role_path }}/defaults/{{ ansible_distribution | lower }}.yml"
-      skip: true
-
-- name: "DEBUG - Debug ansible_role_docker variable values"
-  include: "{{ item }}"
-  with_first_found:
-    - files:
-        - "{{ fact_role_path }}/tasks/debug.yml"
-      skip: true
-  when: ansible_role_docker_debug is defined and ansible_role_docker_debug
+#- name: "Run any OS specific tasks"
+#  include: "{{ item }}"
+#  with_first_found:
+#    - files:
+#        - "{{ fact_role_path }}/tasks/{{ ansible_distribution | lower }}_{{ ansible_distribution_version }}.yml"
+#        - "{{ fact_role_path }}/tasks/{{ ansible_distribution | lower }}.yml"
+#        - "{{ fact_role_path }}/tasks/{{ ansible_os_family | lower }}.yml"
+#      skip: true
 
 # END - boilerplate tasks
 
 # OS Versions
 
 ## DEBUGGING
-
+#
 - name: "DEBUG - value of ansible_distribution"
   debug: var=ansible_distribution
   when: ansible_role_docker_debug
@@ -51,48 +41,53 @@
   debug: var=ansible_distribution_major_version
   when: ansible_role_docker_debug
 
-## CentOS
+- name: "Run {{ ansible_distribution }}-{{ ansible_distribution_version }} specific tasks"
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "tasks/{{ ansible_distribution | lower }}_{{ ansible_distribution_version }}.yml"
+        - "tasks/{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}.yml"
+        - "tasks/{{ ansible_distribution | lower }}.yml"
+        - "tasks/{{ ansible_os_family | lower }}.yml"
+      skip: true
 
-- name: "Run CentOS  specific tasks"
-  include_tasks: "centos_{{item}}.yml"
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version| int == item
-  with_items:
-    - 7
-    - 8
-    - 9
-
-## Debian
-
-- name: "Run Debian  (Stretch) specific tasks"
-  include_tasks: "debian_{{ item }}.yml"
-  when: ansible_distribution == 'Debian' and ansible_distribution_major_version| int == item
-  with_items:
-    - 7
-    - 8
-    - 9
-
-## Ubuntu
-
-- name: "Run Ubuntu specific tasks"
-  include_tasks: "ubuntu_{{item}}.yml"
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == item
-  with_items:
-      - 12.04
-      - 14.04
-      - 16.04
-      - 17.04
-      - 18.04
-      - 19.04
-
-- name: "Install necessary packages"
-  become: yes
-  package:
-    name: "{{item}}"
-    state: present
-  with_items: "{{ansible_role_docker.external_linux_packages}}"
-
-- name: "Setup grub"
-  include_tasks: "grub.yml"
-
-- name: "Setup Docker runtime"
-  include_tasks: "docker.yml"
+#  with_items:
+#    - 7
+#    - 8
+#    - 9
+#
+### Debian
+#
+#- name: "Run Debian  (Stretch) specific tasks"
+#  include_tasks: "debian_{{ item }}.yml"
+#  when: ansible_distribution == 'Debian' and ansible_distribution_major_version| int == item
+#  with_items:
+#    - 7
+#    - 8
+#    - 9
+#
+### Ubuntu
+#
+#- name: "Run Ubuntu specific tasks"
+#  include_tasks: "ubuntu_{{item}}.yml"
+#  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == item
+#  with_items:
+#      - 12.04
+#      - 14.04
+#      - 16.04
+#      - 17.04
+#      - 18.04
+#      - 19.04
+#
+#- name: "Install necessary packages"
+#  become: yes
+#  package:
+#    name: "{{item}}"
+#    state: present
+#  with_items: "{{ansible_role_docker.external_linux_packages}}"
+#
+#- name: "Setup grub"
+#  include_tasks: "grub.yml"
+#
+#- name: "Setup Docker runtime"
+#  include_tasks: "docker.yml"

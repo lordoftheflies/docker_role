@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: "Initialize role"
+  hosts: all
   become: false
   gather_facts: true
   pre_tasks:
@@ -9,6 +10,5 @@
     - debug: var=fact_controller_home
     - set_fact: fact_project_path="{{ lookup('pipe','pwd') }}"
     - debug: var=fact_project_path
-
 - import_playbook: playbook.yml
 
