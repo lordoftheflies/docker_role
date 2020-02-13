@@ -4,7 +4,7 @@
   package:
     name: "{{ excluded_linux_package }}"
     state: absent
-  with_items: "{{ excluded_linux_packages }}"
+  with_items: "{{ ansible_role_docker.excluded_linux_packages }}"
   loop_control:
     loop_var: excluded_linux_package
 
@@ -13,7 +13,7 @@
   package:
     name: "{{ included_linux_package }}"
     state: present
-  with_items: "{{ included_linux_packages }}"
+  with_items: "{{ ansible_role_docker.included_linux_packages }}"
   loop_control:
     loop_var: included_linux_package
 
@@ -41,37 +41,108 @@
   yum:
     update_cache: yes
 
+
+- name: "Ensure group for Docker exists"
+  become: yes
+  group:
+    name: docker
+    state: present
+
+- name: "Add default docker user."
+  become: yes
+  user:
+    name: docker
+    shell: /bin/bash
+    group: docker
+    state: present
+
+- name: "Add the user {{ lookup('pipe', 'whoami') }} with a bash shell, appending the group 'docker' the user's groups"
+  become: yes
+  user:
+    name: "{{ lookup('pipe', 'whoami') }}"
+    state: present
+    groups: docker
+    append: yes
+
 - name: "Install custom linux packages"
   become: yes
   package:
     name: "{{ custom_linux_package }}"
     state: present
-  with_items: "{{ custom_linux_packages }}"
+  with_items: "{{ ansible_role_docker.custom_linux_packages }}"
   loop_control:
     loop_var: custom_linux_package
 
-- name: "Create a data container"
-  docker_container:
-    name: review-container
-    image: hello-world
-    volumes:
-      - /data
 
-#
-#
-#- name: "Install necessary packages"
+- name: "Install custom python modules"
+  become: yes
+  pip:
+    name: docker
+    state: present
+    executable: pip3
+
+#- name: "Create a data container"
 #  become: yes
-#  package:
-#    name: "{{ custom_linux_package }}"
-#    state: present
-#  loop:
-#    - docker
-#    - docker-engine
-#    - docker.io
-#    - containerd
-#    - runc
-#  loop_control:
-#    loop_var: custom_linux_package
+#  docker_container:
+#    name: review-container
+#    image: hello-world
+#    volumes:
+#      - /data
+
+- name: "Remove working directory"
+  become: yes
+  file:
+    path: "{{ ansible_role_docker.variables_directory }}"
+    state: absent
+- name: "Add working directory"
+  become: yes
+  file:
+    path: "{{ ansible_role_docker.variables_directory }}"
+    state: directory
+
+- name: "Enable docker-socket service"
+  become: yes
+  systemd:
+    name: docker.socket
+    enabled: yes
+
+- name: "Enable docker service"
+  become: yes
+  systemd:
+    name: docker.service
+    enabled: yes
+
+- name: "Configuring remote access with daemon.json"
+  become: yes
+  template:
+    backup: yes
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  when: ansible_role_docker.listening_hosts is defined
+  tags: [ "cherubits", "docker", "daemon" ]
+
+- name: "Add docker daemon unit"
+  become: yes
+  template:
+    backup: yes
+    src: dockerd.unit.j2
+    dest: /lib/systemd/system/docker.service
+    mode: u=rwx,g=rx,o=rx
+  tags: [ "cherubits", "docker", "systemd" ]
+
+- name: "Restart 'docker-socket' service"
+  become: yes
+  systemd:
+    name: docker.socket
+    state: restarted
+
+- name: "Restart 'docker' service"
+  become: yes
+  systemd:
+    name: docker.service
+    daemon_reload: yes
+    state: restarted
+
 #- name: "Setup grub"
 #  include_tasks: "grub.yml"
 #
