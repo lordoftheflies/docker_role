@@ -15,4 +15,4 @@ install:
   - ansible --version
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 script:
-  - ansible-playbook tests/travis_test.yml -i tests/travis_inventory --syntax-check
+  - ansible-playbook tests/travis_test.yml -i tests/inventory.ini --syntax-check
