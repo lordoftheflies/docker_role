@@ -1,7 +1,6 @@
 ---
-
 galaxy_info:
-  role_name: ansible_role_docker
+  role_name: 'ansible_role_docker'
   version: '0.1.0'
   description: 'Ansible Galaxy role for Docker.'
   author: 'László Hegedűs'
@@ -11,7 +10,7 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - all
+        - disco
   galaxy_tags:
     - cherubits
     - docker
